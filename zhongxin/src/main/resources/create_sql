@@ -1,0 +1,61 @@
+create table account
+(
+    account_number      varchar(19)                     not null comment '账号',
+    name                varchar(20)                     not null comment '客户名称',
+    password            varchar(6)     default '888888' not null comment '6位数字密码',
+    identification      varchar(40)                     null comment '身份证号码',
+    identification_type varchar(20)                     null comment '证件类型',
+    account_name        varchar(40)                     null comment '账户名称',
+    amount              decimal(19, 2) default 0.00     not null comment '账户余额',
+    status              int                             null comment '账户状态',
+    created_by          int                             null comment '创建人',
+    created_time        datetime                        not null,
+    constraint account_account_number_uindex
+        unique (account_number),
+    constraint account_counter_id_fk
+        foreign key (created_by) references counter (id)
+)
+    comment '客户信息表';
+
+alter table account
+    add primary key (account_number);
+
+create table counter
+(
+    id           int auto_increment,
+    name         varchar(6)  not null comment '柜员名',
+    password     varchar(32) not null comment '密码',
+    created_by   int         null comment '创建人',
+    created_time datetime    not null comment '创建时间',
+    constraint counter_id_uindex
+        unique (id)
+)
+    comment '柜员信息表';
+
+alter table counter
+    add primary key (id);
+
+create table transfer
+(
+    id            bigint auto_increment,
+    payee_name    int            not null comment '收款户名',
+    payee_account varchar(19)    not null comment '收款账号',
+    payer_name    varchar(6)     not null comment '付款户名',
+    payer_account varchar(19)    null comment '付款账号',
+    amount        decimal(19, 2) not null comment '转账金额',
+    created_by    int            null comment '创建人',
+    created_time  datetime       not null comment '创建时间/转账成功时间',
+    constraint id
+        unique (id),
+    constraint transfer___fk_created
+        foreign key (created_by) references counter (id),
+    constraint transfer___fk_payee
+        foreign key (payee_account) references account (account_number),
+    constraint transfer___fk_payer
+        foreign key (payer_account) references account (account_number)
+)
+    comment '交易明细表';
+
+alter table transfer
+    add primary key (id);
+
